@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Pelanggan - TechMart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <a href="/" class="btn btn-secondary mb-3">&larr; Kembali ke Beranda</a>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Daftar Pelanggan</h2>
+            <a href="/pelanggan/tambah" class="btn btn-success">+ Tambah Pelanggan Baru</a>
+        </div>
+        <div class="card shadow p-4">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama Pelanggan</th>
+                        <th>Alamat</th>
+                        <th>Telepon</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pl in pelanggan %}
+                    <tr>
+                        <td>{{ pl.id_pelanggan }}</td>
+                        <td>{{ pl.nama_pelanggan }}</td>
+                        <td>{{ pl.alamat }}</td>
+                        <td>{{ pl.telepon }}</td>
+                        <td class="text-center">
+                            <a href="/pelanggan/edit/{{ pl.id_pelanggan }}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="/pelanggan/hapus/{{ pl.id_pelanggan }}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus pelanggan ini?')">Hapus</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
