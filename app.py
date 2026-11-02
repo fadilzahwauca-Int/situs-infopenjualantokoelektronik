@@ -168,6 +168,7 @@ def edit_produk(id):
         
     cursor.execute("SELECT * FROM produk WHERE id_produk = %s", (id,))
     p = cursor.fetchone()
+    if produk['stok'] < jml:
     cursor.close()
     conn.close()
     return render_template('edit_produk.html', produk=p)
@@ -237,7 +238,7 @@ def hapus_pelanggan(id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM pelanggan WHERE id_pelanggan = %s", (id,))
-    transaksi_terkait = cursor.fetchall()
+    result = cursor.fetchone()
     
     if transaksi_terkait:
         cursor.close()
