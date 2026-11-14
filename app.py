@@ -1,16 +1,17 @@
 import os
 from flask import Flask, render_template, request, redirect, session, url_for
 import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash  
- 
-app = Flask(__name__, template_folder='templates') 
-app.secret_key = 'techmart_secret_key'
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+app = Flask(__name__, template_folder='templates')
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+app.secret_key = os.environ.get('SECRET_KEY', 'techmart_secret_key')
 
 db_config = {
     'host': os.environ.get('DB_HOST', '127.0.0.1'),
-    'user': os.environ.get('DB_USER', 'root'),
+    'user': os.environ.get('DB_USER',) or os.environ.get('DB_USERNAME', 'root'),
     'password': os.environ.get('DB_PASSWORD', ''),
-    'database': os.environ.get('DB_NAME', 'db_techmart'),
+    'database': os.environ.get('DB_NAME',) or os.environ.get('DB_DATABASE', 'db_techmart'),
     'port': int(os.environ.get('DB_PORT', 3306)) 
 }
 
@@ -337,6 +338,10 @@ def detail_transaksi():
     cursor.close()
     conn.close()
     return render_template('detail_transaksi.html', detail=data_detail)
+
+@app.route('/healthz')
+def healthz():
+    return 'ok', 200
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
