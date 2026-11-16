@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, session, url_for
 import mysql.connector
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__, template_folder='templates')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
@@ -9,9 +10,9 @@ app.secret_key = os.environ.get('SECRET_KEY', 'techmart_secret_key')
 
 db_config = {
     'host': os.environ.get('DB_HOST', '127.0.0.1'),
-    'user': os.environ.get('DB_USER',) or os.environ.get('DB_USERNAME', 'root'),
+    'user': os.environ.get('DB_USER') or os.environ.get('DB_USERNAME', 'root'),
     'password': os.environ.get('DB_PASSWORD', ''),
-    'database': os.environ.get('DB_NAME',) or os.environ.get('DB_DATABASE', 'db_techmart'),
+    'database': os.environ.get('DB_NAME') or os.environ.get('DB_DATABASE', 'db_techmart'),
     'port': int(os.environ.get('DB_PORT', 3306)) 
 }
 
@@ -97,7 +98,6 @@ def forgot_password():
         
         if user:
             hashed_password = generate_password_hash(new_password)
-            
             update_query = "UPDATE users SET password = %s WHERE id_user = %s"
             cursor.execute(update_query, (hashed_password, user['id_user']))
             conn.commit()
@@ -169,7 +169,7 @@ def edit_produk(id):
         
     cursor.execute("SELECT * FROM produk WHERE id_produk = %s", (id,))
     p = cursor.fetchone()
-    if produk['stok'] < jml:
+   
     cursor.close()
     conn.close()
     return render_template('edit_produk.html', produk=p)
@@ -237,11 +237,12 @@ def edit_pelanggan(id):
 @app.route('/pelanggan/hapus/<int:id>')
 def hapus_pelanggan(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM pelanggan WHERE id_pelanggan = %s", (id,))
+    cursor = conn.cursor(dictionary=True)
+    
+    cursor.execute("SELECT COUNT(*) as count FROM transaksi WHERE id_pelanggan = %s", (id,))
     result = cursor.fetchone()
     
-    if transaksi_terkait:
+    if result['count'] > 0:
         cursor.close()
         conn.close()
         return """
@@ -283,7 +284,7 @@ def tambah_transaksi():
         jml = int(request.form['jml'])
         tanggal = request.form['tanggal_transaksi']
         
-        cursor.execute("SELECT harga FROM produk WHERE id_produk = %s", (id_produk,))
+        cursor.execute("SELECT harga, stok FROM produk WHERE id_produk = %s", (id_produk,))
         produk = cursor.fetchone()
 
         if produk['stok'] < jml:
@@ -345,4 +346,4 @@ def healthz():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port, debug=False) 
+    app.run(host='0.0.0.0', port=port, debug=False)
