@@ -6,3 +6,5 @@ I somehow got it working? I use EthioDeploy for web deployment and freesqldataba
 
 Personal Note 1 : I TRIED to use PythonAnywhere but i got locked out of the database section where i hit a paywall because i actually did put a database there on accident. 
 I want to delete the database with a new one, but i suddenly got hit with paywall. I genuinely hate free hosting websites that are actually just freemium. 
+
+Update 1 : Apparently, as of early November, my freesqldatabase database got expired. Bruh. I went and build a new account for it to keep maintenance of the website due to a presentation from my professor? She's saying that the class needs to do a presentation because we cant do presentations very well.
